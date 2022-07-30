@@ -1,44 +1,14 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable global-require */
-/* eslint-disable import/no-dynamic-require */
-import classNames from 'classnames';
 import * as React from 'react';
-import './style.less';
+import { StyledIcon } from './styled';
+import { IIconProps } from './types';
+import useIcon from './useIcon';
 
-export enum EIcon {
-  Placeholder = 'placeholder',
-  Checkbox = 'square',
-  CheckboxIndeterminate = 'square-square',
-  CheckboxChecked = 'check-square',
-  TogglerCollapsed = 'plus-square',
-  TogglerUncollapsed = 'minus-square',
-  Folder = 'folder',
-  File = 'file',
-  Car = 'crow',
-}
-
-export interface IIconProps {
-  icon: EIcon;
-  className?: string;
-  onClick?: () => void;
-}
-
-const Icon: React.FC<IIconProps> = ({ icon, onClick, className }) => {
-  const onClickHandler = React.useCallback(() => {
-    onClick?.();
-  }, [onClick]);
-  let svgIcon: string;
-  try {
-    svgIcon = require(`../../assets/icons/${icon}.svg`);
-  } catch {
-    svgIcon = require(`../../assets/icons/placeholder.svg`);
-  }
-  const classes = classNames(className, 'icon');
+const Icon: React.FC<IIconProps> = (props) => {
+  const { onClickHandler, svgIcon, className } = useIcon(props);
   return (
-    <div
+    <StyledIcon
+      className={className}
       onClick={onClickHandler}
-      className={classes}
-      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: svgIcon }}
     />
   );

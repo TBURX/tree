@@ -1,46 +1,16 @@
 import * as React from 'react';
-import Icon, { EIcon } from '../icon';
-import './style.less';
+import Icon from '../icon';
+import { checkboxIcons } from './consts';
+import { Wrapper } from './styled';
+import { ICheckboxProps } from './types';
+import useCheckbox from './useCheckbox';
 
-export enum ECheckboxState {
-  Blank,
-  Checked,
-  Indeterminate,
-}
-
-export interface ICheckboxProps {
-  checked?: ECheckboxState;
-  onStateChange?: (state: ECheckboxState) => void;
-}
-
-const checkboxIcons: Record<ECheckboxState, EIcon> = {
-  [ECheckboxState.Blank]: EIcon.Checkbox,
-  [ECheckboxState.Checked]: EIcon.CheckboxChecked,
-  [ECheckboxState.Indeterminate]: EIcon.CheckboxIndeterminate,
-};
-
-const Checkbox: React.FC<ICheckboxProps> = ({
-  checked = ECheckboxState.Blank,
-  onStateChange,
-}) => {
-  const [checkboxState, setCheckboxState] = React.useState<ECheckboxState>(
-    ECheckboxState.Blank
-  );
-  const clickHandler = React.useCallback(() => {
-    const newState =
-      checkboxState === ECheckboxState.Checked
-        ? ECheckboxState.Blank
-        : ECheckboxState.Checked;
-    setCheckboxState(newState);
-    onStateChange?.(newState);
-  }, [checkboxState, onStateChange]);
-  React.useEffect(() => {
-    setCheckboxState(checked);
-  }, [checked]);
+const Checkbox: React.FC<ICheckboxProps> = (props) => {
+  const { clickHandler, checkboxState, className } = useCheckbox(props);
   return (
-    <div className="checkbox">
+    <Wrapper className={className}>
       <Icon icon={checkboxIcons[checkboxState]} onClick={clickHandler} />
-    </div>
+    </Wrapper>
   );
 };
 
