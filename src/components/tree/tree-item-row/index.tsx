@@ -2,7 +2,7 @@ import * as React from 'react';
 import Checkbox from '../../checkbox';
 import Icon from '../../icon';
 import { EIcon } from '../../icon/types';
-import { StyledTreeItemRow } from './styled';
+import { StyledTreeItemRow, Toggler } from './styled';
 import { ITreeItemRowProps } from './types';
 import { useTreeItemRow } from './useTreeItemRow';
 
@@ -10,21 +10,29 @@ const TreeItemRowComponent = <T,>(
   props: React.PropsWithChildren<ITreeItemRowProps<T>>
 ) => {
   const {
-    classes,
+    className,
     level,
     clickHandler,
-    togglerClasses,
+    hiddenToggler,
     collapsedState,
     togglerClickHandler,
     checkedState,
     checkStateChangeHandler,
     icon,
     label,
+    innerRef,
+    selected,
   } = useTreeItemRow<T>(props);
   return (
-    <StyledTreeItemRow className={classes} level={level} onClick={clickHandler}>
-      <Icon
-        className={togglerClasses}
+    <StyledTreeItemRow
+      selected={selected}
+      className={className}
+      level={level}
+      onClick={clickHandler}
+      ref={innerRef}
+    >
+      <Toggler
+        hidden={hiddenToggler}
         icon={
           collapsedState ? EIcon.TogglerCollapsed : EIcon.TogglerUncollapsed
         }

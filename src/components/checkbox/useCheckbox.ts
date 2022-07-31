@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ECheckboxState, ICheckboxProps } from './types';
 
 const useCheckbox = (props: ICheckboxProps) => {
-  const { checked, onStateChange } = props;
+  const { checked, onStateChange, className } = props;
   const [checkboxState, setCheckboxState] = React.useState<ECheckboxState>(
     ECheckboxState.Blank
   );
@@ -16,19 +16,17 @@ const useCheckbox = (props: ICheckboxProps) => {
           ? ECheckboxState.Blank
           : ECheckboxState.Checked;
       setCheckboxState(newState);
+      onStateChange?.(newState);
     },
-    [checkboxState]
+    [onStateChange, checkboxState]
   );
   React.useEffect(() => {
     setCheckboxState(checked);
   }, [checked]);
-  React.useEffect(() => {
-    onStateChange?.(checkboxState);
-  }, [checkboxState]);
   return {
     checkboxState,
     clickHandler,
-    className: props.className,
+    className,
   };
 };
 

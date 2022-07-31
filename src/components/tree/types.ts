@@ -11,9 +11,21 @@ export interface ITreeItem<T> {
   data?: T;
 }
 export interface ITreeProps<T> {
+  className?: string;
+  searchable?: boolean;
+  searchString?: string;
+  onSearchStringChanged?: (value: string) => void;
+  onSearch?: () => void;
   items: ITreeItem<T>[];
-  someshit?: T;
-  onItemChangeCheckState?: (state: ECheckboxState, id: string, data: T) => void;
-  onItemChangeCollapsed?: (collapsed: boolean, id: string, data: T) => void;
-  onItemClick?: (id: string, data: T) => void;
+  onItemChangeCheckState?: (
+    state: ECheckboxState,
+    itemPath: string,
+    data: T
+  ) => void;
+  onItemChangeCollapsed?: (
+    collapsed: boolean,
+    itemPath: string,
+    data: T
+  ) => void;
+  onItemClick?: (itemPath: string, data: T) => void;
 }

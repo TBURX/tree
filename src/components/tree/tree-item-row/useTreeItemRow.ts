@@ -1,11 +1,10 @@
-import classNames from 'classnames';
 import * as React from 'react';
 import { ECheckboxState } from '../../checkbox/types';
 import { ITreeItemRowProps } from './types';
 
 export const useTreeItemRow = <T>(props: ITreeItemRowProps<T>) => {
   const {
-    id,
+    itemPath,
     hasChild,
     collapsed,
     checked = ECheckboxState.Blank,
@@ -17,64 +16,52 @@ export const useTreeItemRow = <T>(props: ITreeItemRowProps<T>) => {
     onChangeCollapsed,
     onClick,
     data,
+    innerRef,
+    className,
   } = props;
-  const [collapsedState, setCollapsedState] = React.useState<boolean>(false);
+  const [collapsedState, setCollapsedState] =
+    React.useState<boolean>(collapsed);
   const [checkedState, setCheckedState] =
     React.useState<ECheckboxState>(checked);
-  const onChangeCollapsedTriggered = React.useRef<boolean>(false);
-  const checkedChanged = React.useRef<boolean>(false);
   React.useEffect(() => {
-    if (onChangeCollapsedTriggered.current) {
-      onChangeCollapsedTriggered.current = false;
-      return;
-    }
     setCollapsedState(collapsed);
   }, [collapsed]);
-  React.useEffect(() => {
-    onChangeCollapsedTriggered.current = true;
-    onChangeCollapsed?.(collapsedState, id, data);
-  }, [collapsedState]);
   const togglerClickHandler = React.useCallback<
     React.MouseEventHandler<HTMLDivElement>
   >(
     (event) => {
       event.stopPropagation();
       setCollapsedState(!collapsedState);
+      onChangeCollapsed?.(!collapsedState, itemPath, data);
     },
-    [collapsedState]
+    [onChangeCollapsed, collapsedState, itemPath, data]
   );
   React.useEffect(() => {
-    checkedChanged.current = true;
     setCheckedState(checked);
   }, [checked]);
-  React.useEffect(() => {
-    onChangeCheckState?.(checkedState, id, data);
-  }, [checkedState]);
   const checkStateChangeHandler = React.useCallback(
     (state: ECheckboxState) => {
-      if (checkedChanged.current) {
-        checkedChanged.current = false;
-        return;
-      }
       setCheckedState(state);
+      onChangeCheckState?.(state, itemPath, data);
     },
-    [onChangeCheckState, id, data]
+    [onChangeCheckState, itemPath, data]
   );
   const clickHandler = React.useCallback(() => {
-    onClick?.(id, data);
-  }, [onClick, id, data]);
-  const classes = classNames({ selected });
-  const togglerClasses = classNames({ hidden: !hasChild }, 'toggler');
+    onClick?.(itemPath, data);
+  }, [onClick, itemPath, data]);
+  const hiddenToggler = !hasChild;
   return {
-    classes,
+    className,
     level,
     clickHandler,
-    togglerClasses,
+    hiddenToggler,
     collapsedState,
     togglerClickHandler,
     checkedState,
     checkStateChangeHandler,
     icon,
     label,
+    innerRef,
+    selected,
   };
 };

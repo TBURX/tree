@@ -12,6 +12,7 @@ export enum EIcon {
 
 export interface IIconProps {
   className?: string;
+  hidden?: boolean;
   icon: EIcon;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
 }

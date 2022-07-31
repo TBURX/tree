@@ -4,7 +4,7 @@ import * as React from 'react';
 import { IIconProps } from './types';
 
 const useIcon = (props: IIconProps) => {
-  const { icon, onClick } = props;
+  const { icon, onClick, hidden, className } = props;
   const onClickHandler = React.useCallback<
     React.MouseEventHandler<HTMLDivElement>
   >(
@@ -22,7 +22,8 @@ const useIcon = (props: IIconProps) => {
   return {
     onClickHandler,
     svgIcon,
-    className: props.className,
+    hidden,
+    className,
   };
 };
 

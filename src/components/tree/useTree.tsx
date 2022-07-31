@@ -5,9 +5,17 @@ import TreeItemRow from './tree-item-row';
 import { ITreeItemRowProps } from './tree-item-row/types';
 import { ITreeItem, ITreeProps } from './types';
 
-export const useTree = <T,>(props: ITreeProps<T>) => {
-  const { items, onItemChangeCheckState, onItemChangeCollapsed, onItemClick } =
-    props;
+export const useTree = <T,>({
+  items,
+  onItemChangeCheckState,
+  onItemChangeCollapsed,
+  onItemClick,
+  className,
+  searchable,
+  searchString,
+  onSearchStringChanged,
+  onSearch,
+}: ITreeProps<T>) => {
   const getTreeRowsProps = (
     levelItems: ITreeItem<T>[],
     level = 0,
@@ -16,11 +24,11 @@ export const useTree = <T,>(props: ITreeProps<T>) => {
     let result: ITreeItemRowProps<T>[] = [];
     levelItems.forEach((item, index) => {
       const { collapsed, checked, selected, icon, label, data } = item;
-      const itemId = parentId ? `${parentId}.${index}` : `${index}`;
+      const itemPath = parentId ? `${parentId}.${index}` : `${index}`;
       const hasChild = !!item.items?.length;
       const pr: ITreeItemRowProps<T> = {
         data,
-        id: itemId,
+        itemPath,
         hasChild,
         level,
         collapsed,
@@ -34,7 +42,7 @@ export const useTree = <T,>(props: ITreeProps<T>) => {
       if (hasChild && !collapsed) {
         result = [
           ...result,
-          ...getTreeRowsProps(item.items, level + 1, itemId),
+          ...getTreeRowsProps(item.items, level + 1, itemPath),
         ];
       }
     });
@@ -45,45 +53,82 @@ export const useTree = <T,>(props: ITreeProps<T>) => {
   const [rowProps, setRowProps] = React.useState<ITreeItemRowProps<T>[]>(
     getTreeRowsProps(items)
   );
+  const selectedItemRef = React.createRef<HTMLDivElement>();
+
+  React.useEffect(() => {
+    itemsRef.current = items;
+    setRowProps(getTreeRowsProps(items));
+  }, [items]);
 
   const handleChangeCheck = React.useCallback(
-    (state: ECheckboxState, id: string, data: T) => {
+    (state: ECheckboxState, itemPath: string, data: T) => {
       const clone = _.cloneDeep(itemsRef.current);
-      const item: ITreeItem<T> = _.get(clone, id.split('.').join('.items.'));
+      const item: ITreeItem<T> = _.get(
+        clone,
+        itemPath.split('.').join('.items.')
+      );
       item.checked = state;
-      _.set(clone, id.split('.').join('.items.'), item);
+      _.set(clone, itemPath.split('.').join('.items.'), item);
       itemsRef.current = clone;
       setRowProps(getTreeRowsProps(clone));
-      onItemChangeCheckState?.(state, id, data);
+      onItemChangeCheckState?.(state, itemPath, data);
     },
     [onItemChangeCheckState]
   );
   const handleChangeCollapse = React.useCallback(
-    (collapsed: boolean, id: string, data: T) => {
+    (collapsed: boolean, itemPath: string, data: T) => {
       const clone = _.cloneDeep(itemsRef.current);
-      const item: ITreeItem<T> = _.get(clone, id.split('.').join('.items.'));
+      const item: ITreeItem<T> = _.get(
+        clone,
+        itemPath.split('.').join('.items.')
+      );
       item.collapsed = collapsed;
-      _.set(clone, id.split('.').join('.items.'), item);
+      _.set(clone, itemPath.split('.').join('.items.'), item);
       itemsRef.current = clone;
       setRowProps(getTreeRowsProps(clone));
-      onItemChangeCollapsed?.(collapsed, id, data);
+      onItemChangeCollapsed?.(collapsed, itemPath, data);
     },
     [onItemChangeCollapsed]
   );
   const handleClick = React.useCallback(
-    (id: string, data: T) => {
-      onItemClick?.(id, data);
+    (itemPath: string, data: T) => {
+      onItemClick?.(itemPath, data);
     },
     [onItemClick]
   );
-  const rows = rowProps.map((p) => (
+  const handleSearchStringChanged = React.useCallback(
+    (value: string) => {
+      onSearchStringChanged?.(value);
+    },
+    [onSearchStringChanged]
+  );
+  const handleSearch = React.useCallback(() => {
+    onSearch?.();
+  }, [onSearch]);
+  const selectedRows = rowProps
+    .map((row, index) => ({ row, index }))
+    .filter((rowWithIndex) => rowWithIndex.row.selected);
+  React.useEffect(() => {
+    if (selectedRows.length) {
+      selectedItemRef.current.scrollIntoView({ block: 'nearest' });
+    }
+  }, [selectedRows]);
+  const rows = rowProps.map((p, index) => (
     <TreeItemRow
-      key={p.id}
+      key={p.itemPath}
       {...p}
+      innerRef={index === selectedRows[0]?.index ? selectedItemRef : undefined}
       onChangeCheckState={handleChangeCheck}
       onChangeCollapsed={handleChangeCollapse}
       onClick={handleClick}
     />
   ));
-  return { rows };
+  return {
+    rows,
+    className,
+    searchable,
+    searchString,
+    onSearchStringChanged: handleSearchStringChanged,
+    onSearch: handleSearch,
+  };
 };
