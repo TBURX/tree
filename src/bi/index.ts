@@ -3,6 +3,10 @@ import { nanoid } from 'nanoid';
 import { DefaultNameByType } from './constants';
 import { Entity, EntityType } from './types';
 
+/**
+ * допустим, что здесь идет асинхронный запрос на сервер (на самом деле тут мы просто генерируем сущностей)
+ * @returns возвращает список сущностей
+ */
 export const getEntities = async (): Promise<Entity[]> => {
   const entityCount = _.random(1, 100);
   const entities: Entity[] = [];

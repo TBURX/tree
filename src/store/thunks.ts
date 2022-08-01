@@ -5,6 +5,9 @@ import { Entity } from '../bi/types';
 import { Dispatcher, IState } from './types';
 import { ITreeItem } from '../components/tree/types';
 
+/**
+ * обновление списка сущностей
+ */
 export const load = createAsyncThunk('loadThunk', async (payload, thunkApi) => {
   const { dispatch } = thunkApi;
   const entities = await bi.getEntities();
@@ -58,6 +61,9 @@ const checkParents = createAsyncThunk<
   }
 });
 
+/**
+ * отмечает выбранный элемент и если нужно отмечает или убирает галку с родителей и потомков
+ */
 export const setChecked = createAsyncThunk<
   void,
   { id: string; checked: boolean },
@@ -77,6 +83,9 @@ export const setChecked = createAsyncThunk<
   }
 });
 
+/**
+ * устанавливает поисковую строку в стейт и сбрасывает поиск
+ */
 export const setSearchString = createAsyncThunk<
   void,
   string,
@@ -101,6 +110,10 @@ const flattenTree = <T>(items: ITreeItem<T>[]): T[] => {
   return result;
 };
 
+/**
+ * разворачивает ноды с родителями сущности
+ * @param id id сущности
+ */
 const uncollapseParents = (id: string, dispatch: Dispatcher, state: IState) => {
   const collapsedEntityIds = slice.selectors.collapsedEntityIds(state);
   const parent = slice.selectors.parent(state)(id);
@@ -110,6 +123,9 @@ const uncollapseParents = (id: string, dispatch: Dispatcher, state: IState) => {
   }
 };
 
+/**
+ * выполняет поиск по сущностям
+ */
 export const search = createAsyncThunk<void, undefined, { state: IState }>(
   'searchThunk',
   async (payload, thunkApi) => {

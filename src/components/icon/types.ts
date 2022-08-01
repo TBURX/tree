@@ -1,3 +1,6 @@
+/**
+ * соответствуют названиям *.svg иконок
+ */
 export enum EIcon {
   Placeholder = 'placeholder',
   Checkbox = 'square',
