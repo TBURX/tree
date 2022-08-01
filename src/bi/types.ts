@@ -2,6 +2,7 @@ export enum EntityType {
   Folder,
   File,
   Car,
+  Crow,
 }
 export interface Entity {
   id: string;

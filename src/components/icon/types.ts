@@ -7,7 +7,8 @@ export enum EIcon {
   TogglerUncollapsed = 'minus-square',
   Folder = 'folder',
   File = 'file',
-  Car = 'crow',
+  Car = 'car',
+  Crow = 'crow',
 }
 
 export interface IIconProps {

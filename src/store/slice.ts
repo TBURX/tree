@@ -13,6 +13,8 @@ const initialState: IState = {
   selectedEntity: null,
   searchString: '',
   searchPerformed: false,
+  searchResult: [],
+  searchResultIndex: 0,
 };
 
 const { actions, reducer } = createSlice({
@@ -60,6 +62,12 @@ const { actions, reducer } = createSlice({
     setSearchPerformed(state: IState, { payload }: PayloadAction<boolean>) {
       state.searchPerformed = payload;
     },
+    setSearchResult(state: IState, { payload }: PayloadAction<string[]>) {
+      state.searchResult = payload;
+    },
+    setSearchResultIndex(state: IState, { payload }: PayloadAction<number>) {
+      state.searchResultIndex = payload;
+    },
   },
 });
 
@@ -72,6 +80,8 @@ const collapsedEntityIds = (state: IState): string[] =>
   Object.keys(state.collapsedEntities);
 const searchString = (state: IState): string => state.searchString;
 const searchPerformed = (state: IState): boolean => state.searchPerformed;
+const searchResult = (state: IState): string[] => state.searchResult;
+const searchResultIndex = (state: IState): number => state.searchResultIndex;
 const isSelected = createSelector(
   [entities, selectedEntityId],
   (entitiesMap, selectedEntityIdent) => (id: string) =>
@@ -108,6 +118,11 @@ const convertToTreeItem =
     const getIsChecked = isChecked(state);
     const getIsCollapsed = isCollapsed(state);
     const result: ITreeItem<Entity>[] = [];
+    descendants.sort((a, b) => {
+      if (a.name > b.name) return 1;
+      if (a.name < b.name) return -1;
+      return 0;
+    });
     descendants.forEach((child) => {
       const treeItem: ITreeItem<Entity> = {
         data: child,
@@ -127,9 +142,12 @@ const convertToTreeItem =
           const checkedItems = items.filter(
             (it) => it.checked === ECheckboxState.Checked
           );
+          const indeterminateItems = items.filter(
+            (it) => it.checked === ECheckboxState.Indeterminate
+          );
           if (checkedItems.length === items.length || isParentChecked) {
             treeItem.checked = ECheckboxState.Checked;
-          } else if (!checkedItems.length) {
+          } else if (!checkedItems.length && !indeterminateItems.length) {
             treeItem.checked = ECheckboxState.Blank;
           } else {
             treeItem.checked = ECheckboxState.Indeterminate;
@@ -160,9 +178,12 @@ const selectors = {
   parent,
   children,
   treeItems,
+  collapsedEntityIds,
   isChecked,
   searchString,
   searchPerformed,
+  searchResult,
+  searchResultIndex,
 };
 
 export default {

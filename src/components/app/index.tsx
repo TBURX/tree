@@ -4,7 +4,7 @@ import * as thunks from '../../store/thunks';
 import { useDispatch } from '../../store/utils';
 import { ECheckboxState } from '../checkbox/types';
 import Tree from '../tree';
-import { Wrapper } from './styled';
+import { Generator, StyledApp } from './styled';
 import slice from '../../store/slice';
 import { Entity } from '../../bi/types';
 import Button from '../button';
@@ -46,13 +46,13 @@ const App: React.FC = () => {
     dispatch(thunks.search());
   }, []);
   return (
-    <Wrapper>
-      <div style={{ padding: 8 }}>
+    <StyledApp>
+      <Generator>
         <Button
           text="Сгенерировать список сущностей"
           onClick={refreshHandler}
         />
-      </div>
+      </Generator>
       <Tree
         searchable
         items={treeItems}
@@ -63,7 +63,7 @@ const App: React.FC = () => {
         onSearchStringChanged={searchStringChangeHandler}
         onSearch={searchHandler}
       />
-    </Wrapper>
+    </StyledApp>
   );
 };
 

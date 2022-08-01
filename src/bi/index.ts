@@ -5,7 +5,7 @@ import { Entity, EntityType } from './types';
 
 export const getEntities = async (): Promise<Entity[]> => {
   const entityCount = _.random(1, 100);
-  const result: Entity[] = [];
+  const entities: Entity[] = [];
   for (let i = 0; i < entityCount; i++) {
     const type = _.random(0, Object.keys(EntityType).length / 2 - 1);
     const id = nanoid();
@@ -14,17 +14,15 @@ export const getEntities = async (): Promise<Entity[]> => {
       type,
       name: `${DefaultNameByType[type as EntityType]} ${id}`,
     };
-    result.push(entity);
+    entities.push(entity);
   }
-  result.forEach((entity, index) => {
+  const result: Entity[] = [];
+  entities.forEach((entity) => {
     const parentIndex = _.random(0, result.length);
-    if (parentIndex !== index && parentIndex !== result.length) {
+    if (result[parentIndex]) {
       entity.parent = result[parentIndex].id;
     }
+    result.push(entity);
   });
-  const noParent = result.filter((entity) => !entity.parent);
-  if (!noParent.length) {
-    delete result[0].parent;
-  }
-  return result;
+  return entities;
 };

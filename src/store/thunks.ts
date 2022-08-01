@@ -2,12 +2,14 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import slice from './slice';
 import * as bi from '../bi';
 import { Entity } from '../bi/types';
-import { IState } from './types';
+import { Dispatcher, IState } from './types';
+import { ITreeItem } from '../components/tree/types';
 
 export const load = createAsyncThunk('loadThunk', async (payload, thunkApi) => {
   const { dispatch } = thunkApi;
   const entities = await bi.getEntities();
   dispatch(slice.actions.setEntities(entities));
+  dispatch(slice.actions.setSearchPerformed(false));
 });
 
 const checkChildren = createAsyncThunk<
@@ -85,6 +87,29 @@ export const setSearchString = createAsyncThunk<
   dispatch(slice.actions.setSearchString(payload));
 });
 
+const flattenTree = <T>(items: ITreeItem<T>[]): T[] => {
+  const result: T[] = [];
+  items.forEach((item) => {
+    result.push(item.data);
+    if (item.items) {
+      const subitems = flattenTree(item.items);
+      subitems.forEach((sub) => {
+        result.push(sub);
+      });
+    }
+  });
+  return result;
+};
+
+const uncollapseParents = (id: string, dispatch: Dispatcher, state: IState) => {
+  const collapsedEntityIds = slice.selectors.collapsedEntityIds(state);
+  const parent = slice.selectors.parent(state)(id);
+  if (parent && collapsedEntityIds.includes(parent.id)) {
+    dispatch(slice.actions.setCollapsed({ id: parent.id, collapsed: false }));
+    uncollapseParents(parent.id, dispatch, state);
+  }
+};
+
 export const search = createAsyncThunk<void, undefined, { state: IState }>(
   'searchThunk',
   async (payload, thunkApi) => {
@@ -93,12 +118,25 @@ export const search = createAsyncThunk<void, undefined, { state: IState }>(
     const searchPerformed = slice.selectors.searchPerformed(state);
     if (!searchPerformed) {
       const searchString = slice.selectors.searchString(state);
-      const entities = slice.selectors.entities(state);
-      const searchResult = Object.values(entities).filter((entity) =>
-        entity.name.toLowerCase().includes(searchString.toLowerCase())
-      );
-      console.log(searchResult);
+      const treeItems = slice.selectors.treeItems(state);
+      const flatten = flattenTree(treeItems);
+      const searchResult = Object.values(flatten)
+        .filter((entity) =>
+          entity.name.toLowerCase().includes(searchString.toLowerCase())
+        )
+        .map((entity) => entity.id);
+      dispatch(slice.actions.setSearchResult(searchResult));
+      dispatch(slice.actions.setSearchResultIndex(0));
+      uncollapseParents(searchResult[0], dispatch, state);
+      dispatch(slice.actions.setSelectedEntity(searchResult[0]));
       dispatch(slice.actions.setSearchPerformed(true));
+    } else {
+      const searchResult = slice.selectors.searchResult(state);
+      const searchResultIndex = slice.selectors.searchResultIndex(state);
+      const newIndex = (searchResultIndex + 1) % searchResult.length;
+      dispatch(slice.actions.setSearchResultIndex(newIndex));
+      uncollapseParents(searchResult[newIndex], dispatch, state);
+      dispatch(slice.actions.setSelectedEntity(searchResult[newIndex]));
     }
   }
 );

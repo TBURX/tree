@@ -1,7 +1,12 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import { ITreeProps } from './types';
-import { StyledTree, TreeSearch, TreeSearchHeader } from './styled';
+import {
+  StyledTree,
+  TreeSearch,
+  TreeSearchHeader,
+  TreeWrapper,
+} from './styled';
 import { useTree } from './useTree';
 
 const Tree = <T,>(props: React.PropsWithChildren<ITreeProps<T>>) => {
@@ -14,7 +19,7 @@ const Tree = <T,>(props: React.PropsWithChildren<ITreeProps<T>>) => {
     onSearch,
   } = useTree<T>(props);
   return (
-    <>
+    <TreeWrapper>
       {searchable && (
         <TreeSearchHeader>
           <TreeSearch
@@ -25,7 +30,7 @@ const Tree = <T,>(props: React.PropsWithChildren<ITreeProps<T>>) => {
         </TreeSearchHeader>
       )}
       <StyledTree className={className}>{rows}</StyledTree>
-    </>
+    </TreeWrapper>
   );
 };
 

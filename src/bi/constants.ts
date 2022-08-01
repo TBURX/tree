@@ -5,10 +5,12 @@ export const EntityIcons: Record<EntityType, EIcon> = {
   [EntityType.Folder]: EIcon.Folder,
   [EntityType.File]: EIcon.File,
   [EntityType.Car]: EIcon.Car,
+  [EntityType.Crow]: EIcon.Crow,
 };
 
 export const DefaultNameByType: Record<EntityType, string> = {
   [EntityType.Folder]: 'папка',
   [EntityType.File]: 'файл',
   [EntityType.Car]: 'машина',
+  [EntityType.Crow]: 'ворон',
 };

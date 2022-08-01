@@ -1,5 +1,5 @@
-import { Action, AnyAction } from '@reduxjs/toolkit';
-import { ThunkAction, ThunkDispatch } from 'redux-thunk';
+import { AnyAction } from '@reduxjs/toolkit';
+import { ThunkDispatch } from 'redux-thunk';
 import { Entity } from '../bi/types';
 import { IMap } from '../types';
 
@@ -10,7 +10,8 @@ export interface IState {
   collapsedEntities: IMap<boolean>;
   searchString: string;
   searchPerformed: boolean;
+  searchResult: string[];
+  searchResultIndex: number;
 }
 
-export type TypedThunk<T = void> = ThunkAction<T, IState, unknown, Action>;
 export type Dispatcher = ThunkDispatch<IState, unknown, AnyAction>;
