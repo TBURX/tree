@@ -6,4 +6,5 @@ export const StyledIcon = styled.div<{ hidden: boolean }>`
   width: ${styleConstants.iconSize}px;
   height: ${styleConstants.iconSize}px;
   display: inline-block;
+  flex-shrink: 0;
 `;
