@@ -117,8 +117,10 @@ const flattenTree = <T>(items: ITreeItem<T>[]): T[] => {
 const uncollapseParents = (id: string, dispatch: Dispatcher, state: IState) => {
   const collapsedEntityIds = slice.selectors.collapsedEntityIds(state);
   const parent = slice.selectors.parent(state)(id);
-  if (parent && collapsedEntityIds.includes(parent.id)) {
-    dispatch(slice.actions.setCollapsed({ id: parent.id, collapsed: false }));
+  if (parent) {
+    if (collapsedEntityIds.includes(parent.id)) {
+      dispatch(slice.actions.setCollapsed({ id: parent.id, collapsed: false }));
+    }
     uncollapseParents(parent.id, dispatch, state);
   }
 };
