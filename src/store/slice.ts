@@ -119,8 +119,8 @@ const convertToTreeItem =
     const getIsCollapsed = isCollapsed(state);
     const result: ITreeItem<Entity>[] = [];
     descendants.sort((a, b) => {
-      if (a.name > b.name) return 1;
-      if (a.name < b.name) return -1;
+      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
       return 0;
     });
     descendants.forEach((child) => {
